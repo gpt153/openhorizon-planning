@@ -149,12 +149,19 @@ notes: |
   Creating formal planning artifacts to backfill planning workspace and establish
   systematic oversight for remaining 9% of work before February 2026 deadline.
 
+  **Updated Business Model Understanding:**
+  OpenHorizon is Samuel's sustainable Erasmus+ project management tool. Provides:
+  - Budget calculator (Erasmus+ grant amount using official 2024-2027 unit costs)
+  - Profit dashboard (grant vs. costs → margin visibility)
+  - Vendor search agents (find accommodation/food/travel options → cost optimization)
+  - Informed decision-making (choose break-even community projects vs. profitable income projects)
+
   **Critical Path:**
-  1. Fix API timeout issues (blocks budget planning workflow)
-  2. Fix authentication errors (blocks user adoption)
+  1. Fix API timeout issues (CRITICAL - blocks vendor research for margin optimization)
+  2. Fix authentication errors (blocks future expansion if needed)
   3. Complete E2E testing (ensures quality)
   4. Validate production deployment (enables real usage)
-  5. Onboard 3-5 partner organizations (validates product)
+  5. Plan 3-5 real Erasmus+ projects with full visibility (validates tool for real decisions)
 
   **Deployment Status:**
   - Frontend: https://app.openhorizon.cc (Google Cloud Run)

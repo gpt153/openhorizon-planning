@@ -17,22 +17,31 @@
 ## Business Context
 
 ### Problem Statement
-Food and Accommodation AI agents are hitting the 30-second Cloud Run timeout limit during vendor searches, causing complete workflow failures. Users cannot complete the budget planning phase of their Erasmus+ applications, which blocks the entire application creation process. This is a critical blocker for the February 2026 production deadline.
+Food and Accommodation AI agents are hitting the 30-second Cloud Run timeout limit during vendor searches, **blocking the core value proposition of OpenHorizon: informed financial decision-making**. Without working vendor search:
+- Cannot find cost-effective accommodation/food options
+- Cannot compare pricing to optimize project margins
+- Cannot make informed decisions about project viability
+- Cannot choose between break-even (community) vs. profitable (income) projects
+
+The budget calculator shows the **grant amount** (Erasmus+ income), but without vendor searches, **estimated costs** remain unknown. This blocks the Profit Dashboard from showing true project economics.
+
+**Critical for February 2026:** Samuel needs to plan 3-5 real Erasmus+ projects. Without vendor data, impossible to know which projects are financially viable.
 
 ### User Value
-Reliable budget planning is essential for Erasmus+ applications. Users need to:
-- Search for accommodation options in target cities
-- Get food vendor recommendations and pricing
-- Generate accurate budget estimates for grant applications
-- Complete applications without technical failures
+Working vendor search enables:
+- **Financial visibility:** See real accommodation/food costs vs. grant amount
+- **Margin optimization:** Find budget options for higher-profit projects, or premium options for break-even community projects
+- **Informed decisions:** Choose which projects to pursue based on true economics
+- **Time savings:** AI agents search Booking.com, caterers, etc. in minutes vs. hours of manual research
 
-Currently, users experience frustrating timeouts that prevent them from progressing beyond the project design phase.
+**Example:** Project in Stockholm shows €20,000 grant. Vendor search finds accommodation at €80/night (good margin) vs. €150/night (break-even). This data drives decision to accept or modify project.
 
 ### Success Metrics
-- Metric 1: Food/Accommodation agent searches complete successfully 99%+ of the time
-- Metric 2: Average search completion time < 15 seconds (50% reduction from current 30s timeout)
-- Metric 3: Zero timeout-related user support requests
-- Metric 4: Budget planning workflow completion rate increases from ~40% to >90%
+- Metric 1: Food/Accommodation/Travel agent searches complete successfully 99%+ of the time
+- Metric 2: Average search completion time < 20 seconds (user willing to wait for quality results)
+- Metric 3: Search results provide actionable pricing data (€/night, €/meal) for margin calculations
+- Metric 4: Profit Dashboard shows accurate estimated costs based on vendor search data
+- Metric 5: Samuel successfully uses vendor data to plan 3-5 real projects by February 2026
 
 ## Requirements
 
@@ -47,10 +56,10 @@ Currently, users experience frustrating timeouts that prevent them from progress
 - [ ] Preserve existing search functionality (same inputs, same output format)
 
 **SHOULD HAVE:**
-- [ ] Implement search result caching (Redis or database) to avoid redundant AI calls for common queries
+- [ ] Implement search result caching (database) for common destinations (Stockholm, Berlin, Barcelona, etc.) - avoid redundant AI calls, instant results for repeated searches
 - [ ] Add manual retry mechanism for failed searches
-- [ ] Log detailed error information for debugging timeout root causes
-- [ ] Add timeout configuration (make 30s limit configurable)
+- [ ] Log detailed error information for debugging timeout root causes and vendor search quality
+- [ ] Add Travel agent background job (flights/buses) - currently not implemented, needed for complete margin analysis
 
 **COULD HAVE:**
 - [ ] Partial result streaming (show results as they arrive rather than all at once)
@@ -58,9 +67,10 @@ Currently, users experience frustrating timeouts that prevent them from progress
 - [ ] User-configurable search depth (quick vs. thorough search modes)
 
 **WON'T HAVE (this iteration):**
-- Real-time collaboration on budget searches - Deferred to Phase 2
-- Multiple vendor comparison matrix - Simplified to single best recommendation per category
-- Integration with live booking APIs - Out of scope, focus on search/recommendations only
+- Real-time collaboration on budget searches - Single-user focused (Samuel), deferred if expanding user base
+- Multiple vendor comparison matrix - Focus on top 3-5 options per category with pros/cons analysis
+- Integration with live booking APIs - Out of scope, user books manually based on AI recommendations
+- Automatic price monitoring - One-time search only, user manually re-searches if needed
 
 ### Non-Functional Requirements
 
@@ -334,9 +344,16 @@ Cloud Run doesn't maintain persistent connections well (cold starts, scaling). P
 Inngest is already integrated, provides built-in retry logic, error handling, and monitoring. No need to build custom infrastructure.
 
 ### Known Limitations
-- Search results are not streamed in real-time; users wait for entire search to complete
-- No client-side caching of search results across sessions (will implement in future if needed)
+- Search results are not streamed in real-time; users wait for entire search to complete (acceptable - quality results worth the wait)
 - Polling creates some database load (mitigated by indexes and reasonable poll interval)
+- Search results tied to specific search parameters (date, participant count); changing parameters requires new search
+- No automatic price tracking over time (user manually re-searches if planning months in advance)
+
+### Key Value for Samuel's Use Case
+- **Repeat destinations benefit hugely:** First search Stockholm accommodation takes 30s, subsequent projects instant (cached)
+- **Financial decision support:** Vendor data feeds directly into Profit Dashboard margin calculations
+- **Time savings:** 30 seconds AI search vs. 2-3 hours manual research per destination
+- **Quality results:** AI provides pros/cons analysis, not just links - actionable recommendations
 
 ### Future Enhancements
 - Implement result caching (Redis or database) to avoid redundant AI calls for popular destinations
