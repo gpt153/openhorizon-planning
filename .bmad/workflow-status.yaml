@@ -1,107 +1,213 @@
 project: openhorizon
-created: YYYY-MM-DD
-current_phase: analysis | planning | architecture | implementation
-complexity_level: 0 | 1 | 2 | 3 | 4
-planning_track: quick-flow | standard | enterprise
+created: 2025-10-01  # Approximate based on git history
+current_phase: implementation  # 91% complete, transitioning to testing
+complexity_level: 3  # Large, enterprise-grade multi-tenant system
+planning_track: quick-flow  # Build-first approach, retrospective planning
 
 phases:
   analysis:
-    status: pending | in_progress | completed | skipped
-    started_at: YYYY-MM-DDTHH:MM:SS+01:00  # Stockholm time
-    completed_at: YYYY-MM-DDTHH:MM:SS+01:00
+    status: completed
+    started_at: 2025-10-01T10:00:00+01:00  # Stockholm time (estimated)
+    completed_at: 2025-10-15T18:00:00+01:00  # (estimated)
     agent: analyst
     outputs:
-      - project-brief.md
-      - feature-request.md
+      - project-brief.md (backfilled 2026-01-15)
     notes: |
-      Systematic requirements gathering phase.
-      Ask clarifying questions to understand problem deeply.
+      Informal analysis phase completed through user discussions and market research.
+      Formal documentation created retrospectively on 2026-01-15.
+      Focus: Erasmus+ Youth Exchange application pain points.
 
   planning:
-    status: pending | in_progress | completed | skipped
-    started_at: null
+    status: in_progress
+    started_at: 2026-01-15T14:00:00+01:00  # Formal planning artifacts backfill started
     completed_at: null
     agent: pm
     outputs_planned:
-      - prd/feature-name.md
-      - epics/001-epic-name.md
-      - epics/002-epic-name.md
+      - prd/erasmus-application-workflow.md
+      - epics/001-fix-api-timeouts.md
+      - epics/002-auth-stability.md
+      - epics/003-production-readiness.md
     notes: |
-      PRD creation and epic breakdown.
-      Use MoSCoW prioritization.
+      Planning artifacts being created retrospectively to document existing implementation
+      and plan remaining 9% of work. Using MoSCoW prioritization for production readiness.
+      Critical: February 2026 deadline for real Erasmus+ application support.
 
   architecture:
-    status: pending | in_progress | completed | skipped
-    started_at: null
-    completed_at: null
+    status: completed
+    started_at: 2025-10-15T10:00:00+01:00  # (estimated)
+    completed_at: 2025-11-01T18:00:00+01:00  # (estimated)
     agent: architect
     outputs_planned:
-      - architecture/overview.md
-      - architecture/database-schema.md
-      - architecture/api-specification.md
-      - adr/001-decision-title.md
+      - architecture/system-overview.md (to be documented)
+      - architecture/database-schema.md (exists in Prisma schema)
+      - architecture/api-specification.md (to be documented)
+      - adr/001-tech-stack.md (to be created)
+      - adr/002-ai-architecture.md (to be created)
+      - adr/003-multi-tenancy.md (to be created)
+      - adr/004-dual-mode-content.md (to be created)
     notes: |
-      System design and technical decisions.
-      Document WHY, not just WHAT.
+      Architecture implemented and validated through actual codebase.
+      Key decisions include: Next.js 16 + React 19, tRPC for type-safety,
+      Fastify for project-pipeline, LangChain for AI agents, Clerk for auth,
+      multi-tenant with organization-based isolation. Formal ADRs to be created.
 
   implementation:
-    status: pending | in_progress | completed
-    started_at: null
+    status: in_progress  # 91% complete
+    started_at: 2025-10-20T10:00:00+01:00  # (estimated)
     completed_at: null
     agent: scar
     github_issues:
+      - number: null  # No GitHub issues tracked yet in planning workspace
+        title: "Fix Food/Accommodation Agent API Timeouts"
+        status: open
+        epic: "001-fix-api-timeouts"
+        assignee: scar
       - number: null
-        title: null
-        status: open | in_progress | review | done
-        epic: null
+        title: "Resolve Authentication Endpoint 500 Errors"
+        status: open
+        epic: "002-auth-stability"
+        assignee: scar
+      - number: null
+        title: "Verify Production Database Migrations"
+        status: open
+        epic: "003-production-readiness"
         assignee: scar
     notes: |
-      SCAR handles actual code implementation.
-      Supervisor monitors and validates.
+      SCAR has implemented ~91% of core features:
+      ✅ Seed management, conversational elaboration, project generation
+      ✅ Programme builder, project pipeline, document export
+      ✅ Multi-tenant architecture, authentication, dual-mode content
+
+      Remaining work (9%):
+      - Fix API timeout issues (Food/Accommodation agents)
+      - Resolve auth endpoint 500 errors
+      - Complete E2E test coverage
+      - Production deployment validation
+      - User onboarding refinement
 
 # Current Work
-current_epic: null  # e.g., "001-user-authentication"
-active_issues: []   # e.g., [123, 124, 125]
-completed_issues: [] # e.g., [120, 121, 122]
+current_epic: "001-fix-api-timeouts"  # Highest priority for February deadline
+active_issues: []   # Will be populated when GitHub issues created
+completed_issues: [] # Retrospective tracking not included
 
 # Epic Status Tracking
 epics:
   - id: "001"
-    title: null
-    status: draft | active | in_progress | blocked | completed | cancelled
-    priority: high | medium | low
-    complexity: 0 | 1 | 2 | 3 | 4
-    created: YYYY-MM-DD
+    title: "Fix API Timeout Issues (Food/Accommodation Agents)"
+    status: draft  # Epic to be created
+    priority: high
+    complexity: 2  # Medium complexity - refactor to background jobs
+    created: 2026-01-15
     started: null
     completed: null
-    issues: []  # GitHub issue numbers
-    blocked_by: null  # Epic ID if blocked
-    blocks: []  # Epic IDs that depend on this
+    issues: []  # GitHub issues to be created
+    blocked_by: null
+    blocks: ["003"]  # Production readiness depends on this
+    description: "Convert synchronous Food/Accommodation agent searches to Inngest background jobs to resolve 30-second timeout issues"
+
+  - id: "002"
+    title: "Authentication System Stability"
+    status: draft  # Epic to be created
+    priority: high
+    complexity: 1  # Low complexity - debug Clerk integration
+    created: 2026-01-15
+    started: null
+    completed: null
+    issues: []  # GitHub issues to be created
+    blocked_by: null
+    blocks: ["003"]  # Production readiness depends on this
+    description: "Debug and resolve Clerk authentication 500 errors on registration endpoint"
+
+  - id: "003"
+    title: "Production Readiness & Testing"
+    status: draft  # Epic to be created
+    priority: high
+    complexity: 2  # Medium complexity - comprehensive testing and validation
+    created: 2026-01-15
+    started: null
+    completed: null
+    issues: []  # GitHub issues to be created
+    blocked_by: ["001", "002"]  # Must fix critical bugs first
+    blocks: []
+    description: "Complete E2E test coverage, validate production deployment, ensure system ready for February 2026 real-world usage"
 
 # Progress Metrics
 metrics:
-  total_epics: 0
+  total_epics: 3
   completed_epics: 0
-  total_issues: 0
-  completed_issues: 0
+  total_issues: 0  # To be created
+  completed_issues: 0  # Retrospective tracking excluded
   in_progress_issues: 0
   blocked_issues: 0
+  overall_completion: 91  # Percentage (based on feature scope)
+  features_completed: 15  # Major features implemented
+  features_remaining: 3   # Critical bugs + production readiness
 
 # Notes and Context
 notes: |
-  Project-level notes and context.
-  Current focus, blockers, decisions pending, etc.
+  **Current Focus (2026-01-15):**
+  Creating formal planning artifacts to backfill planning workspace and establish
+  systematic oversight for remaining 9% of work before February 2026 deadline.
+
+  **Critical Path:**
+  1. Fix API timeout issues (blocks budget planning workflow)
+  2. Fix authentication errors (blocks user adoption)
+  3. Complete E2E testing (ensures quality)
+  4. Validate production deployment (enables real usage)
+  5. Onboard 3-5 partner organizations (validates product)
+
+  **Deployment Status:**
+  - Frontend: https://app.openhorizon.cc (Google Cloud Run)
+  - Backend: Google Cloud Run + Fastify
+  - Database: Supabase PostgreSQL (pooler mode)
+  - Version: Pre-1.0 beta (~91% complete)
+
+  **Timeline:**
+  - Now (Jan 15): Planning artifacts backfill, epic creation
+  - Jan 22: Critical bugs fixed (API timeouts, auth)
+  - Jan 29: E2E tests complete
+  - Feb 5: Production validation complete
+  - Feb 15: First 3-5 users onboarded
+  - Feb 28: Real Erasmus+ applications submitted (target)
 
 # Decision Log (Quick References)
 decisions:
-  - date: YYYY-MM-DD
-    title: "Decision title"
-    adr: "adr/XXX-decision-title.md"
-    impact: high | medium | low
+  - date: 2025-10-15
+    title: "Next.js 16 + React 19 + TypeScript for type-safety"
+    adr: "adr/001-tech-stack.md"  # To be created
+    impact: high
+
+  - date: 2025-10-20
+    title: "LangChain + Anthropic Claude for AI generation"
+    adr: "adr/002-ai-architecture.md"  # To be created
+    impact: high
+
+  - date: 2025-10-25
+    title: "Multi-tenant architecture with organization-based isolation"
+    adr: "adr/003-multi-tenancy.md"  # To be created
+    impact: high
+
+  - date: 2025-11-01
+    title: "Dual-mode content (working vs. formal language)"
+    adr: "adr/004-dual-mode-content.md"  # To be created
+    impact: medium
+
+  - date: 2025-11-10
+    title: "Separate Fastify service for project-pipeline"
+    adr: "adr/005-pipeline-architecture.md"  # To be created
+    impact: medium
 
 # Review Schedule
 reviews:
-  next_review: YYYY-MM-DD
-  frequency: weekly | bi-weekly | monthly
-  last_review: null
-  review_notes: null
+  next_review: 2026-01-22  # Weekly reviews during critical phase
+  frequency: weekly  # Increased frequency until February deadline
+  last_review: 2026-01-15  # Comprehensive codebase research completed
+  review_notes: |
+    2026-01-15 Review:
+    - Completed comprehensive codebase research
+    - Identified planning vs. implementation gap
+    - Created project brief with real OpenHorizon vision
+    - Updating workflow status to reflect 91% completion
+    - Next: Create epics for remaining work, then ADRs for key decisions
+    - Critical bugs identified: API timeouts, auth 500 errors
+    - February 2026 deadline confirmed for real Erasmus+ applications
