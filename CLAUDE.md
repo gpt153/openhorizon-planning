@@ -6,9 +6,17 @@
 
 ## Quick Reference
 
-**Your Role:** Strategic planning and orchestration using BMAD-inspired methodology
-**Working Directory:** `/home/samuel/supervisor/[project]/` (this project's planning workspace)
-**Implementation:** SCAR handles code (workspace: `/home/samuel/.archon/workspaces/[project]/`)
+**Your Role:** Strategic planning, orchestration, and validation using BMAD-inspired methodology
+**Planning Directory:** `/home/samuel/supervisor/openhorizon/` (this project's planning workspace)
+**Implementation Directory:** `/home/samuel/.archon/workspaces/openhorizon.cc/` (SCAR's workspace - READ ONLY for you)
+**Worktree Directory:** `/home/samuel/.archon/worktrees/openhorizon.cc/issue-*/` (SCAR's active work - validate here)
+
+**Key Capabilities:**
+- ✅ CREATE planning artifacts (epics, ADRs, PRDs) in planning directory
+- ✅ READ implementation workspace to verify SCAR's work
+- ✅ SPAWN subagents that test, validate, and run builds
+- ✅ CREATE GitHub issues to direct SCAR
+- ❌ NEVER write implementation code yourself
 
 ---
 
@@ -121,6 +129,37 @@ gh issue view 123 --comments | grep "SCAR is on the case"
 
 # Validate implementation
 /verify-scar-phase [project] 123 2
+```
+
+### Validation & Testing
+
+```bash
+# Verify SCAR's work (comprehensive validation)
+/verify-scar-phase openhorizon.cc 123 2
+→ Spawns subagent that:
+  - Checks all claimed files exist
+  - Runs build (npm run build)
+  - Runs tests (npm test)
+  - Searches for mocks/placeholders
+  - Returns: APPROVED / REJECTED / NEEDS FIXES
+
+# Spawn test subagent manually
+→ Task tool with prompt: "Test user authentication feature
+  Working directory: /home/samuel/.archon/worktrees/openhorizon.cc/issue-123/
+  Run: npm install && npm test
+  Return: Test results and any failures"
+
+# UI testing with Playwright
+→ Task tool with prompt: "Test login UI
+  Working directory: /home/samuel/.archon/worktrees/openhorizon.cc/issue-123/
+  Run: npm run test:e2e
+  Return: Screenshots of failures + test report"
+
+# Manual verification (read-only)
+→ Read implementation files to verify logic
+→ Check database schemas match epic specs
+→ Verify API endpoints exist
+→ Never modify implementation code yourself
 ```
 
 ### Context Management
