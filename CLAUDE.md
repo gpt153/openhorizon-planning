@@ -23,6 +23,82 @@
 
 ---
 
+## ⚠️ CONTEXT CONSERVATION - CRITICAL RULES
+
+**YOUR #1 JOB: Conserve your context window by spawning subagents for ALL non-trivial work.**
+
+### What YOU Do Directly (Minimal Work)
+
+**ONLY do these directly:**
+- ✅ READ 1-2 files to understand situation
+- ✅ DECIDE what needs to be done
+- ✅ SPAWN subagents to do the actual work
+- ✅ Simple git commands (git status, gh issue view)
+- ✅ REPORT results to user
+
+### What SUBAGENTS Do (Everything Else)
+
+**ALWAYS spawn subagents for:**
+- ❌ Writing ANY document >50 lines (epics, ADRs, analysis docs)
+- ❌ Multiple file edits (updating workflow-status.yaml, project-brief.md, etc.)
+- ❌ Complex analysis (investigating bugs, researching codebase)
+- ❌ Creating planning artifacts (epics, ADRs, PRDs)
+- ❌ Running tests or builds
+- ❌ Any task that takes >3 tool uses
+
+### Example: WRONG Way (Burns Context)
+
+```
+User: "Research the authentication issue"
+
+❌ You do:
+- Explore subagent (good)
+- Write 400-line analysis doc directly (BAD - uses 8K tokens)
+- Update workflow-status.yaml 3 times directly (BAD - wastes tokens)
+- Update project-brief.md directly (BAD)
+- Git commit (acceptable)
+→ Result: Used 15K tokens, 7.5% of your context window GONE
+```
+
+### Example: RIGHT Way (Conserves Context)
+
+```
+User: "Research the authentication issue"
+
+✅ You do:
+- Spawn Task tool subagent with prompt:
+  "Research authentication system in openhorizon codebase.
+   Investigate why login is failing.
+   Create .bmad/AUTH_ISSUE_ANALYSIS.md with findings.
+   Update workflow-status.yaml with new epic if needed.
+   Commit changes.
+   Return: Summary of root cause and fix needed."
+
+- Wait for subagent result
+- Report to user: "Found root cause: [summary from subagent]"
+→ Result: Used 500 tokens, subagent did the work
+```
+
+### When to Spawn Subagents
+
+```
+Task involves >3 tool uses?           → SPAWN SUBAGENT
+Writing document >50 lines?           → SPAWN SUBAGENT
+Multiple file edits?                  → SPAWN SUBAGENT
+Complex analysis?                     → SPAWN SUBAGENT
+Creating epic/ADR/PRD?                → SPAWN SUBAGENT
+Running tests/builds?                 → SPAWN SUBAGENT
+Investigating codebase?               → SPAWN SUBAGENT
+
+Simple status check (1-2 commands)?   → OK to do directly
+Quick git operation?                  → OK to do directly
+Reading 1-2 files?                    → OK to do directly
+```
+
+**REMEMBER:** Your context window is precious. Spawn subagents early and often!
+
+---
+
 ## 🤖 Autonomous Behavior Patterns
 
 **User says natural language → You automatically execute the right workflow.**
