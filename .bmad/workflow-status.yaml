@@ -131,7 +131,7 @@ epics:
 
   - id: "002"
     title: "Authentication System Stability"
-    status: draft  # Epic to be created
+    status: ready  # Epic created and ready for SCAR
     priority: high
     complexity: 1  # Low complexity - debug Clerk integration
     created: 2026-01-15
@@ -140,7 +140,7 @@ epics:
     issues: []  # GitHub issues to be created
     blocked_by: null
     blocks: ["003"]  # Production readiness depends on this
-    description: "Debug and resolve Clerk authentication 500 errors on registration endpoint"
+    description: "Debug and resolve Clerk authentication - re-enable middleware, configure API keys, implement webhooks"
 
   - id: "003"
     title: "Production Readiness & Testing"
