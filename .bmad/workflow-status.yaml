@@ -131,16 +131,25 @@ epics:
 
   - id: "002"
     title: "Authentication System Stability"
-    status: ready  # Epic created and ready for SCAR
+    status: in_progress  # Issue #125 - SCAR working (started 2026-01-16 18:41 UTC)
     priority: high
-    complexity: 1  # Low complexity - debug Clerk integration
+    complexity: 1  # Low complexity - restore and fix Clerk integration
     created: 2026-01-15
-    started: null
+    started: 2026-01-16T18:41:00Z  # SCAR acknowledged issue #125
     completed: null
-    issues: []  # GitHub issues to be created
+    issues:
+      - "#125: Re-enable and Fix Authentication System (IN PROGRESS)"
+    issue_breakdown:
+      - "Issue 1: Configure Clerk API Keys"
+      - "Issue 2: Re-enable Clerk Middleware"
+      - "Issue 3: Create Clerk Webhook Handler"
+      - "Issue 4: Test Sign-Up Flow"
+      - "Issue 5: Test Sign-In Flow"
+      - "Issue 6: Error Handling & User Feedback"
+      - "Issue 7: E2E Tests for Authentication"
     blocked_by: null
     blocks: ["003"]  # Production readiness depends on this
-    description: "Debug and resolve Clerk authentication - re-enable middleware, configure API keys, implement webhooks"
+    description: "Restore and fix Clerk authentication (currently completely disabled). Configure keys, re-enable middleware, implement webhooks, test flows."
 
   - id: "003"
     title: "Production Readiness & Testing"
