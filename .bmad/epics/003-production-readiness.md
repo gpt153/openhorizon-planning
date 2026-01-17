@@ -2,7 +2,8 @@
 
 **Epic ID:** 003
 **Created:** 2026-01-15
-**Status:** Draft
+**Updated:** 2026-01-17
+**Status:** Active
 **Complexity Level:** 2
 
 ## Project Context
@@ -10,20 +11,29 @@
 - **Project:** openhorizon
 - **Repository:** https://github.com/gpt153/openhorizon.cc
 - **Tech Stack:** Next.js 16, React 19, TypeScript, Fastify, Playwright, Vitest, PostgreSQL, Cloud Run
-- **Related Epics:** Blocked by Epic #001 (API Timeouts) and Epic #002 (Auth Stability)
+- **Related Epics:** Blocked by Epic #001 (API Timeouts - ✅ DEPLOYED), Epic #002 (Authentication - ✅ DEPLOYED)
 - **Workspace:** `/home/samuel/.archon/workspaces/openhorizon.cc/`
 - **Worktree Base:** `/home/samuel/.archon/worktrees/openhorizon.cc/`
 
 ## Business Context
 
 ### Problem Statement
-OpenHorizon is ~91% feature-complete but lacks comprehensive testing, production validation, and operational readiness needed to support real users. The February 2026 deadline to support 3-5 Erasmus+ applications requires a stable, well-tested platform that won't fail during critical application submission periods.
+Epic 001 (API Timeouts) and Epic 002 (Authentication) are now **DEPLOYED to production**, completing 98% of OpenHorizon's core functionality. However, **E2E test failures during Epic 001 revealed critical infrastructure gaps** that must be addressed before relying on the platform for real Erasmus+ applications in February 2026:
 
-Without thorough testing and production validation, we risk:
-- Data loss or corruption during user sessions
-- Critical bugs discovered during live usage
-- Performance issues under real-world load
-- Poor user experience that damages credibility
+**Specific Test Infrastructure Issues Identified:**
+- **9 out of 11 E2E tests failed** during Epic 001 deployment validation
+- **Missing test database seeding:** Projects and phases don't exist for tests to operate on
+- **No authentication setup for tests:** Tests can't log in or access protected routes
+- **No fixtures for creating test data:** Each test must manually create all prerequisite data
+- **Test failures do NOT indicate implementation bugs** - Epic 001 functionality works in production (verified at app.openhorizon.cc)
+
+**Production Readiness Gaps:**
+- Unknown production stability under realistic usage patterns
+- No production monitoring to detect or respond to issues
+- Incomplete documentation for user onboarding and disaster recovery
+- No backup and recovery procedures tested
+
+**Critical Context:** Samuel will use OpenHorizon to plan 3-5 real Erasmus+ projects starting February 2026. Each project represents €15,000-€30,000 in grant funding. **Production failures could result in missed application deadlines** and significant financial loss. The final 2% is about **confidence and reliability**, not features.
 
 ### User Value
 Users need to:
@@ -47,14 +57,13 @@ Production readiness ensures OpenHorizon meets professional standards expected b
 ### Functional Requirements (MoSCoW)
 
 **MUST HAVE:**
-- [ ] Complete E2E test coverage for critical paths (seed creation → elaboration → project generation → programme builder → budget planning → document export)
-- [ ] Verify database migrations applied correctly in production
-- [ ] Implement comprehensive error boundaries in React app
-- [ ] Add monitoring/logging for all critical operations
-- [ ] Create runbook for common operational issues
-- [ ] Perform load testing (simulate 50 concurrent users)
-- [ ] Validate all document exports (PDF/DOCX) format correctly
-- [ ] Test multi-tenant isolation (verify org data properly segregated)
+- [ ] Fix E2E test infrastructure (database seeding, test fixtures, authentication setup) - **CRITICAL: Blocks all other testing**
+- [ ] Fix all existing E2E tests from Epic 001 (9/11 failed due to infrastructure gaps, not code bugs)
+- [ ] Validate all critical user flows end-to-end (seed → elaboration → project → programme → budget → vendor search → export)
+- [ ] Production deployment verification (smoke tests on live environment at app.openhorizon.cc)
+- [ ] Basic monitoring and alerting (error rates, response times, Inngest job failures)
+- [ ] Database backup and recovery procedures (automated backups, tested restoration)
+- [ ] User onboarding documentation (getting started guide, feature walkthrough)
 
 **SHOULD HAVE:**
 - [ ] Add performance monitoring (track page load times, API latency)
@@ -183,121 +192,119 @@ project-pipeline/
 
 ### Breakdown into GitHub Issues
 
-**Issue #1: Testing - E2E tests for seed management**
-- Test seed creation flow (brainstorming → seed garden)
-- Test seed editing and versioning
-- Test seed deletion
-- Acceptance: All seed management E2E tests pass
+**Issue #127: Test Infrastructure - Database Seeding & Fixtures**
+- Create test data seed functions (users, organizations, projects, seeds, phases)
+- Add Playwright global setup to seed test database before tests
+- Add global teardown to clean up test data after tests
+- Create reusable fixtures (sample seeds, elaborated projects, programmes)
+- Add authentication helpers for E2E tests (login, get auth token)
+- Acceptance: Tests can create realistic data, authentication works in E2E context
 
-**Issue #2: Testing - E2E tests for conversational elaboration**
-- Test starting elaboration session
-- Test chat interaction with AI
-- Test metadata extraction during elaboration
-- Test progress tracking (completeness %)
-- Test conversion to project at 80% complete
-- Acceptance: All elaboration E2E tests pass
+**Issue #128: Fix E2E Tests - All Existing Tests Pass**
+- Fix 9/11 failed tests from Epic 001 (authentication setup, missing data)
+- Update seed-flow.spec.ts with proper fixtures
+- Update project-flow.spec.ts with database seeding
+- Update vendor-search tests with background job polling
+- Verify auth flows (signup, login, protected routes)
+- Acceptance: All 11 existing E2E tests pass + auth tests pass (100% green)
 
-**Issue #3: Testing - E2E tests for project generation**
-- Test seed → project conversion
-- Test project DNA generation
-- Test objectives generation
-- Test participant profiles generation
-- Test budget generation
-- Acceptance: All project generation E2E tests pass
+**Issue #129: E2E Tests - Complete User Flows**
+- Test full seed → elaboration → project flow (happy path)
+- Test programme builder creation and editing
+- Test budget calculator accuracy (verify Erasmus+ unit costs)
+- Test vendor search background jobs (food, accommodation)
+- Test document export (PDF, DOCX generation)
+- Test multi-tenant isolation (verify org-based data separation)
+- Acceptance: All critical user flows validated end-to-end
 
-**Issue #4: Testing - E2E tests for programme builder**
-- Test multi-day programme creation
-- Test session-level activity planning
-- Test learning objectives integration
-- Test working/formal mode toggle
-- Acceptance: All programme builder E2E tests pass
+**Issue #130: Production Smoke Tests - Deployment Validation**
+- Create smoke test script that runs against production URL (app.openhorizon.cc)
+- Verify homepage loads (HTTP 200)
+- Verify authentication endpoints work (signup/login)
+- Verify protected routes require auth (redirect to login)
+- Verify database connectivity (simple query test)
+- Verify Inngest webhook endpoint responds (health check)
+- Acceptance: Smoke tests can run post-deploy, catch critical failures
 
-**Issue #5: Testing - E2E tests for budget planning**
-- Test Food agent search (background job)
-- Test Accommodation agent search (background job)
-- Test Travel agent search
-- Test budget calculator
-- Test vendor quote management
-- Acceptance: All budget planning E2E tests pass
+**Issue #131: Monitoring & Alerting - Error Tracking**
+- Integrate Sentry for error tracking (Next.js + Fastify)
+- Configure source maps for readable stack traces
+- Set up error alerts (email/Slack on critical errors)
+- Add custom error contexts (user ID, organization ID, request details)
+- Create error dashboard (Sentry or Google Cloud Monitoring)
+- Acceptance: Errors logged to Sentry, alerts trigger on critical issues
 
-**Issue #6: Testing - E2E tests for document export**
-- Test PDF export (application form)
-- Test DOCX export (project report)
-- Verify document formatting is correct
-- Test multi-language support (working vs. formal)
-- Acceptance: All document export E2E tests pass
+**Issue #132: Monitoring & Alerting - Metrics & Observability**
+- Track key metrics (request count, latency p50/p95/p99)
+- Track business metrics (projects created, searches completed, exports generated)
+- Track Inngest job metrics (completion rate, duration, failure rate)
+- Set up alerts for anomalies (error rate >1%, job failure rate >10%)
+- Create monitoring dashboard (Google Cloud Monitoring or Grafana)
+- Acceptance: Metrics visible, alerts configured, dashboard accessible
 
-**Issue #7: Testing - Multi-tenant isolation tests**
-- Test user A cannot access user B's projects (different orgs)
-- Test organization member roles enforce permissions
-- Test database queries properly filter by organizationId
-- Acceptance: All multi-tenant tests pass, no data leaks
+**Issue #133: Database Backup & Recovery**
+- Verify Supabase automated backups enabled (daily backups, 7-day retention)
+- Create backup restoration script (Supabase CLI-based restore)
+- Document backup restoration procedure in RUNBOOK.md
+- Test backup restoration (restore to test environment, verify data integrity)
+- Add backup monitoring (alert if backup fails)
+- Acceptance: Backups automated, restoration tested, procedure documented
 
-**Issue #8: Database - Verify production migrations**
-- Connect to production database (read-only)
-- Run `npx prisma migrate status`
-- Compare schema with Prisma schema.prisma
-- Apply any missing migrations
-- Acceptance: Production DB schema matches codebase
+**Issue #134: Performance Testing - Load Validation**
+- Install K6 for load testing
+- Create load test scenario (simulate 50 concurrent users)
+- Test critical endpoints (project creation, vendor search, document export)
+- Identify performance bottlenecks (slow queries, inefficient API calls)
+- Optimize if needed (database indexes, caching)
+- Acceptance: System handles 50 concurrent users, p95 latency <1s
 
-**Issue #9: Monitoring - Add comprehensive logging**
-- Log all AI generation requests (seed, project, programme)
-- Log all search jobs (Food, Accommodation, Travel)
-- Log all authentication events
-- Log all document exports
-- Add request ID for tracing
-- Acceptance: All critical operations logged
+**Issue #135: Security Audit - Vulnerability Scanning**
+- Run npm audit fix (resolve all high/critical vulnerabilities)
+- Verify authentication works correctly (no unauthorized access)
+- Test multi-tenant isolation (users cannot access other orgs' data)
+- Review environment variable usage (no secrets in code)
+- Scan for common vulnerabilities (SQL injection, XSS, CSRF)
+- Acceptance: Zero high/critical vulnerabilities, auth/isolation verified
 
-**Issue #10: Monitoring - Set up error tracking**
-- Integrate Sentry or similar error tracking service
-- Add error boundaries to React components
-- Configure source maps for production debugging
-- Set up alerts for error spikes
-- Acceptance: Errors automatically reported with stack traces
+**Issue #136: Documentation - User Onboarding**
+- Create ONBOARDING.md (getting started guide)
+- Document key features (seed management, elaboration, project creation, vendor search)
+- Add screenshots/videos of core workflows
+- Create troubleshooting section (common issues and fixes)
+- Update README.md with quick start instructions
+- Acceptance: New user can onboard using documentation alone
 
-**Issue #11: Performance - Load testing**
-- Create load test script (50 concurrent users)
-- Test seed creation under load
-- Test project generation under load
-- Test document export under load
-- Measure database connection pooling
-- Acceptance: System handles 50 users without crashes or timeouts
+**Issue #137: Documentation - Disaster Recovery Runbook**
+- Create RUNBOOK.md (disaster recovery procedures)
+- Document backup restoration procedure (step-by-step)
+- Document common failure scenarios (database down, Cloud Run crash, API timeout)
+- Document recovery steps for each scenario
+- Document monitoring access (Sentry, Google Cloud Monitoring)
+- Acceptance: On-call engineer can recover from common failures using runbook
 
-**Issue #12: Operations - Create runbook**
-- Document how to deploy new versions
-- Document how to rollback deployments
-- Document how to check system health
-- Document how to investigate errors
-- Document how to restore from backup
-- Acceptance: Runbook complete and reviewed
+**Issue #138: Final Production Validation - Real-World Test**
+- Plan 1 complete Erasmus+ project using production system (end-to-end)
+- Validate all features work (seed → elaboration → project → programme → budget → vendor search → export)
+- Measure time savings vs. manual planning (target: <6 hours vs. 40-60 hours manual)
+- Document any issues found (bugs, UX friction, missing features)
+- Fix critical issues before declaring production-ready
+- Acceptance: Complete real project successfully, zero critical failures
 
-**Issue #13: User Experience - Onboarding flow**
-- Add welcome modal for first-time users
-- Add tooltips for key features
-- Add sample project template (optional)
-- Add help documentation links
-- Acceptance: New users can complete first project without confusion
-
-**Issue #14: Security - Vulnerability audit**
-- Run `npm audit` and fix all high/critical issues
-- Review all environment variables (no secrets in git)
-- Verify HTTPS enforced on all endpoints
-- Verify CORS configured correctly
-- Verify rate limiting on public endpoints
-- Acceptance: Zero high/critical vulnerabilities
 
 ### Estimated Effort
-- E2E tests (6 test suites): 18 hours
-- Multi-tenant isolation tests: 3 hours
-- Database migration verification: 2 hours
-- Logging and monitoring: 6 hours
-- Error tracking setup: 3 hours
-- Load testing: 4 hours
-- Runbook and documentation: 4 hours
-- Onboarding flow: 6 hours
-- Security audit: 4 hours
-- Manual testing and bug fixes: 10 hours
-- Total: 60 hours (~7-8 days)
+- Test infrastructure (seeding, fixtures): 6 hours
+- Fix existing E2E tests: 4 hours
+- New E2E tests (complete flows): 6 hours
+- Production smoke tests: 2 hours
+- Monitoring integration (Sentry): 3 hours
+- Metrics & observability: 4 hours
+- Backup & recovery: 4 hours
+- Performance testing: 4 hours
+- Security audit: 3 hours
+- User documentation: 4 hours
+- Runbook documentation: 3 hours
+- Final validation (real project): 6 hours
+- Total: 49 hours (~6-7 days)
 
 ## Acceptance Criteria
 
@@ -334,8 +341,8 @@ project-pipeline/
 ## Dependencies
 
 **Blocked By:**
-- Epic #001: API Timeouts (must be fixed before budget planning tests)
-- Epic #002: Auth Stability (must be fixed before auth/onboarding tests)
+- Epic #001: Fix API Timeouts (✅ DEPLOYED 2026-01-16) - Background job system live
+- Epic #002: Authentication Stability (✅ DEPLOYED 2026-01-16) - Clerk authentication working
 
 **Blocks:**
 - None (final epic before production launch)
